@@ -1,4 +1,8 @@
 defmodule Geohax do
+  @moduledoc """
+  Geohash encoding and decoding.
+  """
+
   import Integer, only: [is_even: 1]
   use Bitwise
 
@@ -10,15 +14,25 @@ defmodule Geohax do
   # API
 
   @doc """
-  Encode a position `{longitude, latitude}` to a Geohash of `precision`
+  Encodes a position `{longitude, latitude}` to a Geohash of `precision`
   length.
+
+  ## Example
+
+      iex> Geohax.encode(-132.83, -38.1033, 6)
+      "311x1r"
   """
   def encode(longitude, latitude, precision \\ 12) do
     bencode(longitude, latitude, precision * 5) |> to_base32
   end
 
   @doc """
-  Decode a Geohash to a position `{longitude, latitude}`.
+  Decodes a Geohash to a position `{longitude, latitude}`.
+
+  ## Example
+
+      iex> Geohax.decode("311x1r")
+      {-132.83, -38.1033}
   """
   def decode(geohash) do
     geohash
