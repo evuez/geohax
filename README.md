@@ -1,6 +1,9 @@
 # Geohax
 
+[![Hex.pm](https://img.shields.io/hexpm/v/geohax.svg)](https://hex.pm/packages/geohax)
 [![Build Status](https://travis-ci.org/evuez/geohax.svg?branch=master)](https://travis-ci.org/evuez/geohax)
+[![Inline docs](http://inch-ci.org/github/evuez/geohax.svg)](http://inch-ci.org/github/evuez/geohax)
+[![Hex.pm](https://img.shields.io/hexpm/dt/geohax.svg)](https://hex.pm/packages/geohax)
 
 Geohash encoding and decoding for Elixir.
 
