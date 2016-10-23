@@ -9,6 +9,8 @@ Geohash encoding and decoding for Elixir.
 
 ## Usage
 
+### Encoding and decoding
+
 ```elixir
 iex> Geohax.encode(-132.83, -38.1033, 6)
 "311x1r"
@@ -17,6 +19,15 @@ iex> Geohax.decode("311x1r")
 ```
 
 Note that the format for coordinates is `{longitude, latitude}`.
+
+### Finding neighbors
+
+```elixir
+iex> Geohax.neighbors("311x1r")
+[north: "311x32", south: "311x1q", east: "311x1x", west: "311x1p"]
+iex> Geohax.neighbor("311x1r", :north)
+"311x32"
+```
 
 ## Installation
 

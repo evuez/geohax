@@ -11,6 +11,19 @@ defmodule Geohax do
   @lon_range {-180, 180}
   @lat_range {-90, 90}
 
+  @neighbors [
+    north: {'p0r21436x8zb9dcf5h7kjnmqesgutwvy', 'bc01fg45238967deuvhjyznpkmstqrwx'},
+    south: {'14365h7k9dcfesgujnmqp0r2twvyx8zb', '238967debc01fg45kmstqrwxuvhjyznp'},
+    east:  {'bc01fg45238967deuvhjyznpkmstqrwx', 'p0r21436x8zb9dcf5h7kjnmqesgutwvy'},
+    west:  {'238967debc01fg45kmstqrwxuvhjyznp', '14365h7k9dcfesgujnmqp0r2twvyx8zb'}
+  ]
+  @borders [
+    north: {"prxz", "bcfguvyz"},
+    south: {"028b", "0145hjnp"},
+    east:  {"bcfguvyz", "prxz"},
+    west:  {"0145hjnp", "028b"}
+  ]
+
   # API
 
   @doc """
@@ -39,6 +52,50 @@ defmodule Geohax do
      |> to_base10
      |> to_bits
      |> bdecode
+  end
+
+  @doc """
+  Find neighbors of a Geohash.
+
+  ## Example
+
+      iex> Geohax.neighbors("311x1r")
+      [north: "311x32", south: "311x1q", east: "311x1x", west: "311x1p"]
+  """
+  def neighbors(geohash) do
+    [north: neighbor(geohash, :north),
+     south: neighbor(geohash, :south),
+     east:  neighbor(geohash, :east),
+     west:  neighbor(geohash, :west)]
+  end
+
+  @doc """
+  Find neighbor of a Geohash in a given direction.
+
+  Allowed directions are `:north`, `:south`, `:east` and `:west`.
+
+  ## Example
+
+      iex> Geohax.neighbor("311x1r", :north)
+      "311x32"
+  """
+  # Function taken from http://www.movable-type.co.uk/scripts/geohash.html
+  # This is for now just a pale copy of the aforementioned JavaScript
+  # function and should be rewritten in a more Elixir-ish way.
+  def neighbor(geohash, direction) do
+    last = String.last(geohash)
+    type = rem(String.length(geohash), 2)
+    base = String.slice(geohash, 0..-2)
+    <<last_bits::size(8)>> = last
+
+    if String.contains?(elem(@borders[direction], type), last) do
+      base = neighbor(base, direction)
+    end
+
+    base <> <<(Enum.at(@base32, Enum.find_index(
+       elem(@neighbors[direction], type),
+       fn(c) -> c == last_bits end
+    )))::size(8)>>
   end
 
   # Core
