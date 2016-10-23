@@ -35,6 +35,7 @@ defmodule Geohax do
       iex> Geohax.encode(-132.83, -38.1033, 6)
       "311x1r"
   """
+  @spec encode(float, float, pos_integer) :: String.t
   def encode(longitude, latitude, precision \\ 12) do
     bencode(longitude, latitude, precision * 5) |> to_base32
   end
@@ -47,6 +48,7 @@ defmodule Geohax do
       iex> Geohax.decode("311x1r")
       {-132.83, -38.1033}
   """
+  @spec decode(String.t) :: {float, float}
   def decode(geohash) do
     geohash
      |> to_base10
@@ -62,6 +64,7 @@ defmodule Geohax do
       iex> Geohax.neighbors("311x1r")
       [north: "311x32", south: "311x1q", east: "311x1x", west: "311x1p"]
   """
+  @spec neighbors(String.t) :: [{atom, String.t}]
   def neighbors(geohash) do
     [north: neighbor(geohash, :north),
      south: neighbor(geohash, :south),
@@ -82,6 +85,7 @@ defmodule Geohax do
   # Function taken from http://www.movable-type.co.uk/scripts/geohash.html
   # This is for now just a pale copy of the aforementioned JavaScript
   # function and should be rewritten in a more Elixir-ish way.
+  @spec neighbor(String.t, atom) :: String.t
   def neighbor(geohash, direction) do
     last = String.last(geohash)
     type = rem(String.length(geohash), 2)
