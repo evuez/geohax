@@ -18,10 +18,10 @@ defmodule Geohax do
     west:  {'238967debc01fg45kmstqrwxuvhjyznp', '14365h7k9dcfesgujnmqp0r2twvyx8zb'}
   ]
   @borders [
-    north: {"prxz", "bcfguvyz"},
-    south: {"028b", "0145hjnp"},
-    east:  {"bcfguvyz", "prxz"},
-    west:  {"0145hjnp", "028b"}
+    north: {'prxz', 'bcfguvyz'},
+    south: {'028b', '0145hjnp'},
+    east:  {'bcfguvyz', 'prxz'},
+    west:  {'0145hjnp', '028b'}
   ]
 
   # API
@@ -83,23 +83,19 @@ defmodule Geohax do
       "311x32"
   """
   # Function taken from http://www.movable-type.co.uk/scripts/geohash.html
-  # This is for now just a pale copy of the aforementioned JavaScript
-  # function and should be rewritten in a more Elixir-ish way.
   @spec neighbor(String.t, atom) :: String.t
   def neighbor(geohash, direction) do
-    last = String.last(geohash)
+    <<last::size(8)>> = String.last(geohash)
     type = rem(String.length(geohash), 2)
     base = String.slice(geohash, 0..-2)
-    <<last_bits::size(8)>> = last
 
-    if String.contains?(elem(@borders[direction], type), last) do
-      base = neighbor(base, direction)
-    end
-
-    base <> <<(Enum.at(@base32, Enum.find_index(
-       elem(@neighbors[direction], type),
-       fn(c) -> c == last_bits end
-    )))::size(8)>>
+    case Enum.member?(elem(@borders[direction], type), last) do
+      true  -> neighbor(base, direction)
+      false -> base
+    end <> <<(Enum.at(
+      @base32,
+      :string.str(elem(@neighbors[direction], type), [last]) - 1
+    ))::size(8)>>
   end
 
   # Core
@@ -116,9 +112,9 @@ defmodule Geohax do
   defp encode_partial(value, size, {min, max}) do
     middle = avg(min, max)
 
-    cond do
-      value < middle    -> encode_partial(value, size - 2, {min, middle})
-      true -> exp2(size) + encode_partial(value, size - 2, {middle, max})
+    case value < middle do
+      true  -> encode_partial(value, size - 2, {min, middle})
+      false -> exp2(size) + encode_partial(value, size - 2, {middle, max})
     end
   end
 
@@ -152,9 +148,7 @@ defmodule Geohax do
 
   defp to_base32(n), do: (for << i::size(5) <- n >>, do: Enum.fetch!(@base32, i)) |> to_string
   defp to_base10(""), do: []
-  defp to_base10(<<char::size(8)>> <> str) do
-    [Enum.find_index(@base32, fn(c) -> c == char end) | to_base10(str)]
-  end
+  defp to_base10(<<char::size(8)>> <> str), do: [:string.str(@base32, [char]) - 1 | to_base10(str)]
   defp to_bits([]), do: []
   defp to_bits([n | tail]) do
     Enum.map(4..0, &bit_at(n, &1)) ++ to_bits(tail)
