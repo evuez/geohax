@@ -72,20 +72,19 @@ defmodule Geohax do
     south_border(ne, se, sw)
   end
 
-  defp south_border(ne, se, sw, s_acc \\ []) do
-    if Enum.member?(s_acc, sw) do
-      north_border(ne, s_acc, s_acc)
+  defp south_border(ne, se, sw, acc \\ []) do
+    if Enum.member?(acc, sw) do
+      north_border(ne, acc)
     else
-      south_border(ne, neighbor(se, :west), sw, [se | s_acc])
+      south_border(ne, neighbor(se, :west), sw, [se | acc])
     end
   end
 
-  defp north_border(ne, acc, row) do
+  defp north_border(ne, row, acc \\ []) do
     if Enum.member?(row, ne) do
-      acc
+      acc ++ row
     else
-      next_row = Enum.map(row, & neighbor(&1, :north))
-      north_border(ne, acc ++ next_row, next_row)
+      north_border(ne, Enum.map(row, &neighbor(&1, :north)), acc ++ row)
     end
   end
 
