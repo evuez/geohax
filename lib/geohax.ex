@@ -57,6 +57,38 @@ defmodule Geohax do
   end
 
   @doc """
+  Return all the Geohashes in Envelope [min_lat, min_lon, max_lat, max_lon] in precision
+  TODO Calculate Geohashes in Polygon with holes, add Geohash Compression
+
+  ## Examples
+
+      iex> Geohax.geohashes([52.291725, 16.731831, 52.508736, 17.071703])
+      ["u37ck", "u37cm", "u37cq", "u37cr", "u3k12", "u3k13", "u3k16", "u3k17", "u3k1k", "u37cs", "u37ct", "u37cw", "u37cx", "u3k18", "u3k19", "u3k1d", "u3k1e", "u3k1s", "u37cu", "u37cv", "u37cy", "u37cz", "u3k1b", "u3k1c", "u3k1f", "u3k1g", "u3k1u", "u37fh", "u37fj", "u37fn", "u37fp", "u3k40", "u3k41", "u3k44", "u3k45", "u3k4h", "u37fk", "u37fm", "u37fq", "u37fr", "u3k42", "u3k43", "u3k46", "u3k47", "u3k4k", "u37fs", "u37ft", "u37fw", "u37fx", "u3k48", "u3k49", "u3k4d", "u3k4e", "u3k4s"]
+  """
+  def geohashes([min_lat, min_lon, max_lat, max_lon], precision \\ 5) do
+    sw = encode(min_lon, min_lat, precision)
+    ne = encode(max_lon, max_lat, precision)
+    se = encode(max_lon, min_lat, precision)
+    south_border(ne, se, sw)
+  end
+
+  defp south_border(ne, se, sw, acc \\ []) do
+    if Enum.member?(acc, sw) do
+      north_border(ne, acc)
+    else
+      south_border(ne, neighbor(se, :west), sw, [se | acc])
+    end
+  end
+
+  defp north_border(ne, row, acc \\ []) do
+    if Enum.member?(row, ne) do
+      acc ++ row
+    else
+      north_border(ne, Enum.map(row, &neighbor(&1, :north)), acc ++ row)
+    end
+  end
+
+  @doc """
   Find neighbors of a Geohash.
 
   ## Example
