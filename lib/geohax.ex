@@ -57,7 +57,7 @@ defmodule Geohax do
   end
 
   @doc """
-  Find neighbors of a Geohash.
+  Finds neighbors of a Geohash.
 
   ## Example
 
@@ -73,7 +73,7 @@ defmodule Geohax do
   end
 
   @doc """
-  Find neighbor of a Geohash in a given direction.
+  Finds neighbor of a Geohash in a given direction.
 
   Allowed directions are `:north`, `:south`, `:east` and `:west`.
 
@@ -99,14 +99,19 @@ defmodule Geohax do
   end
 
   @doc """
-  Return all the geohashes within `[min_lat, min_lon, max_lat, max_lon]`.
+  Finds all the Geohashes within `{min_lon, min_lat, max_lon, max_lat}` with the
+  given `precision`.
 
   ## Examples
 
-      iex> Geohax.within([52.291725, 16.731831, 52.508736, 17.071703])
+      iex> Geohax.within({16.731831, 52.291725, 17.071703, 52.508736})
       ["u37ck", "u37cm", "u37cq", "u37cr", "u3k12", "u3k13", "u3k16", "u3k17", "u3k1k", "u37cs", "u37ct", "u37cw", "u37cx", "u3k18", "u3k19", "u3k1d", "u3k1e", "u3k1s", "u37cu", "u37cv", "u37cy", "u37cz", "u3k1b", "u3k1c", "u3k1f", "u3k1g", "u3k1u", "u37fh", "u37fj", "u37fn", "u37fp", "u3k40", "u3k41", "u3k44", "u3k45", "u3k4h", "u37fk", "u37fm", "u37fq", "u37fr", "u3k42", "u3k43", "u3k46", "u3k47", "u3k4k", "u37fs", "u37ft", "u37fw", "u37fx", "u3k48", "u3k49", "u3k4d", "u3k4e", "u3k4s"]
+
+      iex> Geohax.within({16.731831, 52.291725, 17.071703, 52.508736}, 3)
+      ["u37", "u3k"]
   """
-  def within([min_lat, min_lon, max_lat, max_lon], precision \\ 5) do
+  @spec within({float, float, float, float}, pos_integer) :: [String.t]
+  def within({min_lon, min_lat, max_lon, max_lat}, precision \\ 5) do
     sw = encode(min_lon, min_lat, precision)
     ne = encode(max_lon, max_lat, precision)
     se = encode(max_lon, min_lat, precision)
