@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.org/evuez/geohax.svg?branch=master)](https://travis-ci.org/evuez/geohax)
 [![Inline docs](http://inch-ci.org/github/evuez/geohax.svg)](http://inch-ci.org/github/evuez/geohax)
 [![Hex.pm](https://img.shields.io/hexpm/dt/geohax.svg)](https://hex.pm/packages/geohax)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fevuez%2Fgeohax.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fevuez%2Fgeohax?ref=badge_shield)
 
 Geohash encoding and decoding for Elixir.
 
@@ -47,3 +48,7 @@ end
 ```
 
 Then, run `mix deps.get` to fetch the new dependency.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fevuez%2Fgeohax.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fevuez%2Fgeohax?ref=badge_large)
