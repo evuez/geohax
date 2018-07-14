@@ -7,6 +7,30 @@
 
 Geohash encoding and decoding for Elixir.
 
+## Ordering of longitude and latitude
+
+*Every* function in `Geohax` use the `longitude,latitude` ordering; make sure not to invert these! 
+
+Both [Redis](https://redis.io/commands/geoadd) and [PostGIS](https://postgis.net/docs/ST_MakePoint.html) use this same ordering, but if you feel strongly about that and would prefer to use `latitude,longitude` instead, you can simply create a new module that does this for you:
+
+```elixir
+defmodule MyGeohash do
+  def decode(geohash) do
+    {lon, lat} = Geohax.decode(geohash)
+    {lat, lon}
+  end
+
+  def encode(latitude, longitude, precision \\ 12),
+    do: Geohax.encode(longitude, latitude, precision)
+
+  defdelegate neighbor(geohash, direction), to: Geohax
+
+  defdelegate neighbors(geohash), to: Geohax
+
+  defdelegate within(arg, precision \\ 5), to: Geohax
+end
+```
+
 ## Usage
 
 ### Encoding and decoding
