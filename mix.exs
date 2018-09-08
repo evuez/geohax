@@ -33,7 +33,10 @@ defmodule Geohax.Mixfile do
   end
 
   def deps do
-    [{:ex_doc, ">= 0.0.0", only: :dev},
-     {:inch_ex, only: :docs}]
+    [
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:inch_ex, ">= 0.0.0", only: :docs},
+      {:benchfella, ">= 0.0.0", only: :dev}
+    ]
   end
 end

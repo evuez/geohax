@@ -135,13 +135,22 @@ defmodule Geohax do
   end
 
   defp encode_partial(_value, size, _range) when size < 0, do: 0
-
+  defp encode_partial(_value, size, _range, acc) when size < 0, do: 0 + acc
   defp encode_partial(value, size, {min, max}) do
     middle = avg(min, max)
 
     case value < middle do
       true -> encode_partial(value, size - 2, {min, middle})
-      false -> (1 <<< size) + encode_partial(value, size - 2, {middle, max})
+      false -> encode_partial(value, size - 2, {middle, max}, (1 <<< size))
+    end
+  end
+  defp encode_partial(value, size, {min, max}, acc) do
+    middle = avg(min, max)
+
+    case value < middle do
+      true -> encode_partial(value, size - 2, {min, middle})
+      false -> encode_partial(value, size - 2, {middle, max}, acc + (1 <<< size))
+      #false -> (1 <<< size) + encode_partial(value, size - 2, {middle, max})
     end
   end
 
@@ -160,7 +169,6 @@ defmodule Geohax do
   end
 
   defp decode_partial([], {min, max}), do: avg(min, max) |> to_fixed({min, max})
-
   defp decode_partial([{bit, _} | bits], {min, max}) do
     middle = avg(min, max)
 
