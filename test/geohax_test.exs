@@ -20,7 +20,7 @@ defmodule GeohaxTest do
   end
 
   test "should return all the geohashes within an envelope" do
-    assert Geohax.within({16.731831, 52.291725, 17.071703, 52.508736}) ==
+    assert Geohax.within({16.731831, 52.291725}, {17.071703, 52.508736}) ==
              [
                "u37ck",
                "u37cm",
@@ -80,7 +80,7 @@ defmodule GeohaxTest do
   end
 
   test "should return all the geohashes within an envelope with given precision" do
-    assert Geohax.within({16.731831, 52.291725, 17.071703, 52.508736}, 3) == [
+    assert Geohax.within({16.731831, 52.291725}, {17.071703, 52.508736}, 3) == [
              "u37",
              "u3k"
            ]
