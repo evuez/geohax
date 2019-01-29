@@ -14,14 +14,14 @@ defmodule Geohax do
   @neighbors [
     north: {'p0r21436x8zb9dcf5h7kjnmqesgutwvy', 'bc01fg45238967deuvhjyznpkmstqrwx'},
     south: {'14365h7k9dcfesgujnmqp0r2twvyx8zb', '238967debc01fg45kmstqrwxuvhjyznp'},
-    east:  {'bc01fg45238967deuvhjyznpkmstqrwx', 'p0r21436x8zb9dcf5h7kjnmqesgutwvy'},
-    west:  {'238967debc01fg45kmstqrwxuvhjyznp', '14365h7k9dcfesgujnmqp0r2twvyx8zb'}
+    east: {'bc01fg45238967deuvhjyznpkmstqrwx', 'p0r21436x8zb9dcf5h7kjnmqesgutwvy'},
+    west: {'238967debc01fg45kmstqrwxuvhjyznp', '14365h7k9dcfesgujnmqp0r2twvyx8zb'}
   ]
   @borders [
     north: {'prxz', 'bcfguvyz'},
     south: {'028b', '0145hjnp'},
-    east:  {'bcfguvyz', 'prxz'},
-    west:  {'0145hjnp', '028b'}
+    east: {'bcfguvyz', 'prxz'},
+    west: {'0145hjnp', '028b'}
   ]
 
   # API
@@ -35,7 +35,7 @@ defmodule Geohax do
       iex> Geohax.encode(-132.83, -38.1033, 6)
       "311x1r"
   """
-  @spec encode(float, float, pos_integer) :: String.t
+  @spec encode(float, float, pos_integer) :: String.t()
   def encode(longitude, latitude, precision \\ 12) do
     bencode(longitude, latitude, precision * 5) |> to_base32
   end
@@ -48,12 +48,12 @@ defmodule Geohax do
       iex> Geohax.decode("311x1r")
       {-132.83, -38.1033}
   """
-  @spec decode(String.t) :: {float, float}
+  @spec decode(String.t()) :: {float, float}
   def decode(geohash) do
     geohash
-     |> to_base10
-     |> to_bits
-     |> bdecode
+    |> to_base10
+    |> to_bits
+    |> bdecode
   end
 
   @doc """
@@ -64,12 +64,14 @@ defmodule Geohax do
       iex> Geohax.neighbors("311x1r")
       [north: "311x32", south: "311x1q", east: "311x1x", west: "311x1p"]
   """
-  @spec neighbors(String.t) :: [{atom, String.t}]
+  @spec neighbors(String.t()) :: [{atom, String.t()}]
   def neighbors(geohash) do
-    [north: neighbor(geohash, :north),
-     south: neighbor(geohash, :south),
-     east:  neighbor(geohash, :east),
-     west:  neighbor(geohash, :west)]
+    [
+      north: neighbor(geohash, :north),
+      south: neighbor(geohash, :south),
+      east: neighbor(geohash, :east),
+      west: neighbor(geohash, :west)
+    ]
   end
 
   @doc """
@@ -83,19 +85,20 @@ defmodule Geohax do
       "311x32"
   """
   # Function taken from http://www.movable-type.co.uk/scripts/geohash.html
-  @spec neighbor(String.t, atom) :: String.t
+  @spec neighbor(String.t(), atom) :: String.t()
   def neighbor(geohash, direction) do
     <<last::size(8)>> = String.last(geohash)
     type = rem(String.length(geohash), 2)
     base = String.slice(geohash, 0..-2)
 
     case Enum.member?(elem(@borders[direction], type), last) do
-      true  -> neighbor(base, direction)
+      true -> neighbor(base, direction)
       false -> base
-    end <> <<(Enum.at(
-      @base32,
-      :string.str(elem(@neighbors[direction], type), [last]) - 1
-    ))::size(8)>>
+    end <>
+      <<Enum.at(
+          @base32,
+          :string.str(elem(@neighbors[direction], type), [last]) - 1
+        )::size(8)>>
   end
 
   @doc """
@@ -110,7 +113,7 @@ defmodule Geohax do
       iex> Geohax.within({16.731831, 52.291725, 17.071703, 52.508736}, 3)
       ["u37", "u3k"]
   """
-  @spec within({float, float, float, float}, pos_integer) :: [String.t]
+  @spec within({float, float, float, float}, pos_integer) :: [String.t()]
   def within({min_lon, min_lat, max_lon, max_lat}, precision \\ 5) do
     sw = encode(min_lon, min_lat, precision)
     ne = encode(max_lon, max_lat, precision)
@@ -125,15 +128,16 @@ defmodule Geohax do
   defp bencode(lon, lat, size) do
     blon = encode_partial(lon, size - 1, @lon_range)
     blat = encode_partial(lat, size - 2, @lat_range)
-    <<(blon + blat)::size(size)>>
+    <<blon + blat::size(size)>>
   end
 
   defp encode_partial(_value, size, _range) when size < 0, do: 0
+
   defp encode_partial(value, size, {min, max}) do
     middle = avg(min, max)
 
     case value < middle do
-      true  -> encode_partial(value, size - 2, {min, middle})
+      true -> encode_partial(value, size - 2, {min, middle})
       false -> exp2(size) + encode_partial(value, size - 2, {middle, max})
     end
   end
@@ -141,9 +145,10 @@ defmodule Geohax do
   ## Decoding
 
   defp bdecode(hash) do
-    {lon_bits, lat_bits} = hash
-      |> Enum.with_index
-      |> Enum.partition(fn({_, i}) -> is_even(i) end)
+    {lon_bits, lat_bits} =
+      hash
+      |> Enum.with_index()
+      |> Enum.split_with(fn {_, i} -> is_even(i) end)
 
     lon = decode_partial(lon_bits, @lon_range)
     lat = decode_partial(lat_bits, @lat_range)
@@ -152,6 +157,7 @@ defmodule Geohax do
   end
 
   defp decode_partial([], {min, max}), do: avg(min, max) |> to_fixed({min, max})
+
   defp decode_partial([{bit, _} | bits], {min, max}) do
     middle = avg(min, max)
 
@@ -166,15 +172,21 @@ defmodule Geohax do
   defp exp2(n), do: :math.pow(2, n) |> round
   defp avg(x, y), do: (x + y) / 2
 
-  defp to_base32(n), do: (for << i::size(5) <- n >>, do: Enum.fetch!(@base32, i)) |> to_string
+  defp to_base32(n),
+    do: for(<<i::size(5) <- n>>, do: Enum.fetch!(@base32, i)) |> to_string
+
   defp to_base10(""), do: []
-  defp to_base10(<<char::size(8)>> <> str), do: [:string.str(@base32, [char]) - 1 | to_base10(str)]
+
+  defp to_base10(<<char::size(8)>> <> str),
+    do: [:string.str(@base32, [char]) - 1 | to_base10(str)]
+
   defp to_bits([]), do: []
+
   defp to_bits([n | tail]) do
     Enum.map(4..0, &bit_at(n, &1)) ++ to_bits(tail)
   end
 
-  defp bit_at(bits, index), do: ((1 <<< index) &&& bits) >>> index
+  defp bit_at(bits, index), do: (1 <<< index &&& bits) >>> index
 
   # Format the given coordinate to a fixed-point notation.
   # Function taken from http://www.movable-type.co.uk/scripts/geohash.html
