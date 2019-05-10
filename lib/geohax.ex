@@ -84,25 +84,24 @@ defmodule Geohax do
       iex> Geohax.neighbor("311x1r", :north)
       "311x32"
   """
-  # Function taken from http://www.movable-type.co.uk/scripts/geohash.html
   @spec neighbor(String.t(), atom) :: String.t()
   def neighbor(geohash, direction) do
     <<last::size(8)>> = String.last(geohash)
     type = rem(String.length(geohash), 2)
     base = String.slice(geohash, 0..-2)
 
-    case Enum.member?(elem(@borders[direction], type), last) do
-      true -> neighbor(base, direction)
-      false -> base
-    end <>
-      <<Enum.at(
+    if(last in elem(@borders[direction], type), do: neighbor(base, direction), else: base) <>
+      <<Enum.fetch!(
           @base32,
-          :string.str(elem(@neighbors[direction], type), [last]) - 1
+          :string.str(
+            elem(@neighbors[direction], type),
+            [last]
+          ) - 1
         )::size(8)>>
   end
 
   @doc """
-  Finds all the Geohashes within `{min_lon, min_lat, max_lon, max_lat}` with the
+  Finds all the Geohashes within `{min_lon, min_lat}, {max_lon, max_lat}` with the
   given `precision`.
 
   ## Examples
@@ -136,10 +135,9 @@ defmodule Geohax do
   defp encode_partial(value, size, {min, max}) do
     middle = avg(min, max)
 
-    case value < middle do
-      true -> encode_partial(value, size - 2, {min, middle})
-      false -> exp2(size) + encode_partial(value, size - 2, {middle, max})
-    end
+    if value < middle,
+      do: encode_partial(value, size - 2, {min, middle}),
+      else: exp2(size) + encode_partial(value, size - 2, {middle, max})
   end
 
   ## Decoding
@@ -158,14 +156,11 @@ defmodule Geohax do
 
   defp decode_partial([], {min, max}), do: avg(min, max) |> to_fixed({min, max})
 
-  defp decode_partial([{bit, _} | bits], {min, max}) do
-    middle = avg(min, max)
+  defp decode_partial([{0, _} | bits], {min, max}),
+    do: decode_partial(bits, {min, avg(min, max)})
 
-    cond do
-      bit == 0 -> decode_partial(bits, {min, middle})
-      bit == 1 -> decode_partial(bits, {middle, max})
-    end
-  end
+  defp decode_partial([{1, _} | bits], {min, max}),
+    do: decode_partial(bits, {avg(min, max), max})
 
   # Helpers
 
@@ -181,10 +176,7 @@ defmodule Geohax do
     do: [:string.str(@base32, [char]) - 1 | to_base10(str)]
 
   defp to_bits([]), do: []
-
-  defp to_bits([n | tail]) do
-    Enum.map(4..0, &bit_at(n, &1)) ++ to_bits(tail)
-  end
+  defp to_bits([n | tail]), do: Enum.map(4..0, &bit_at(n, &1)) ++ to_bits(tail)
 
   defp bit_at(bits, index), do: (1 <<< index &&& bits) >>> index
 
@@ -195,18 +187,14 @@ defmodule Geohax do
   end
 
   defp south_border(ne, se, sw, acc \\ []) do
-    if Enum.member?(acc, sw) do
-      north_border(ne, acc)
-    else
-      south_border(ne, neighbor(se, :west), sw, [se | acc])
-    end
+    if sw in acc,
+      do: north_border(ne, acc),
+      else: south_border(ne, neighbor(se, :west), sw, [se | acc])
   end
 
   defp north_border(ne, row, acc \\ []) do
-    if Enum.member?(row, ne) do
-      acc ++ row
-    else
-      north_border(ne, Enum.map(row, &neighbor(&1, :north)), acc ++ row)
-    end
+    if ne in row,
+      do: acc ++ row,
+      else: north_border(ne, Enum.map(row, &neighbor(&1, :north)), acc ++ row)
   end
 end
