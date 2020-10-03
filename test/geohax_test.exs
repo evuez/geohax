@@ -11,12 +11,12 @@ defmodule GeohaxTest do
   end
 
   test "should find geohash neighbors" do
-    assert Geohax.neighbors("311x1r") == [
+    assert Geohax.neighbors("311x1r") == %{
              north: "311x32",
              south: "311x1q",
              east: "311x1x",
              west: "311x1p"
-           ]
+           }
   end
 
   test "should return all the geohashes within an envelope" do

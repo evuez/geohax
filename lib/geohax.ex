@@ -62,16 +62,16 @@ defmodule Geohax do
   ## Example
 
       iex> Geohax.neighbors("311x1r")
-      [north: "311x32", south: "311x1q", east: "311x1x", west: "311x1p"]
+      %{north: "311x32", south: "311x1q", east: "311x1x", west: "311x1p"}
   """
-  @spec neighbors(String.t()) :: [{atom, String.t()}]
+  @spec neighbors(String.t()) :: %{atom() => String.t()}
   def neighbors(geohash) do
-    [
+    %{
       north: neighbor(geohash, :north),
       south: neighbor(geohash, :south),
       east: neighbor(geohash, :east),
       west: neighbor(geohash, :west)
-    ]
+    }
   end
 
   @doc """
