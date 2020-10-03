@@ -48,7 +48,7 @@ Note that the format for coordinates is `{longitude, latitude}`.
 
 ```elixir
 iex> Geohax.neighbors("311x1r")
-[north: "311x32", south: "311x1q", east: "311x1x", west: "311x1p"]
+%{north: "311x32", south: "311x1q", east: "311x1x", west: "311x1p"}
 iex> Geohax.neighbor("311x1r", :north)
 "311x32"
 ```
