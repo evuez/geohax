@@ -6,6 +6,8 @@ defmodule Geohax do
 
   import Integer, only: [is_even: 1]
 
+  @type direction() :: :north | :south | :east | :west
+
   @base32 '0123456789bcdefghjkmnpqrstuvwxyz'
 
   @lon_range {-180, 180}
@@ -64,7 +66,7 @@ defmodule Geohax do
       iex> Geohax.neighbors("311x1r")
       %{north: "311x32", south: "311x1q", east: "311x1x", west: "311x1p"}
   """
-  @spec neighbors(String.t()) :: %{atom() => String.t()}
+  @spec neighbors(String.t()) :: %{direction() => String.t()}
   def neighbors(geohash) do
     %{
       north: neighbor(geohash, :north),
@@ -84,7 +86,7 @@ defmodule Geohax do
       iex> Geohax.neighbor("311x1r", :north)
       "311x32"
   """
-  @spec neighbor(String.t(), atom()) :: String.t()
+  @spec neighbor(String.t(), direction()) :: String.t()
   def neighbor(geohash, direction) do
     <<last::size(8)>> = String.last(geohash)
     type = rem(String.length(geohash), 2)
