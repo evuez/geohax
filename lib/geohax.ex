@@ -2,9 +2,9 @@ defmodule Geohax do
   @moduledoc """
   Geohash encoding and decoding.
   """
+  use Bitwise
 
   import Integer, only: [is_even: 1]
-  use Bitwise
 
   @base32 '0123456789bcdefghjkmnpqrstuvwxyz'
 
@@ -35,9 +35,9 @@ defmodule Geohax do
       iex> Geohax.encode(-132.83, -38.1033, 6)
       "311x1r"
   """
-  @spec encode(float, float, pos_integer) :: String.t()
+  @spec encode(float(), float(), pos_integer()) :: String.t()
   def encode(longitude, latitude, precision \\ 12) do
-    bencode(longitude, latitude, precision * 5) |> to_base32
+    bencode(longitude, latitude, precision * 5) |> to_base32()
   end
 
   @doc """
@@ -48,12 +48,12 @@ defmodule Geohax do
       iex> Geohax.decode("311x1r")
       {-132.83, -38.1033}
   """
-  @spec decode(String.t()) :: {float, float}
+  @spec decode(String.t()) :: {float(), float()}
   def decode(geohash) do
     geohash
-    |> to_base10
-    |> to_bits
-    |> bdecode
+    |> to_base10()
+    |> to_bits()
+    |> bdecode()
   end
 
   @doc """
@@ -84,7 +84,7 @@ defmodule Geohax do
       iex> Geohax.neighbor("311x1r", :north)
       "311x32"
   """
-  @spec neighbor(String.t(), atom) :: String.t()
+  @spec neighbor(String.t(), atom()) :: String.t()
   def neighbor(geohash, direction) do
     <<last::size(8)>> = String.last(geohash)
     type = rem(String.length(geohash), 2)
@@ -112,7 +112,7 @@ defmodule Geohax do
       iex> Geohax.within({16.731831, 52.291725}, {17.071703, 52.508736}, 3)
       ["u37", "u3k"]
   """
-  @spec within({float, float}, {float, float}, pos_integer) :: [String.t()]
+  @spec within({float(), float()}, {float(), float()}, pos_integer()) :: [String.t()]
   def within({min_lon, min_lat}, {max_lon, max_lat}, precision \\ 5) do
     sw = encode(min_lon, min_lat, precision)
     ne = encode(max_lon, max_lat, precision)
@@ -164,11 +164,11 @@ defmodule Geohax do
 
   # Helpers
 
-  defp exp2(n), do: :math.pow(2, n) |> round
+  defp exp2(n), do: :math.pow(2, n) |> round()
   defp avg(x, y), do: (x + y) / 2
 
   defp to_base32(n),
-    do: for(<<i::size(5) <- n>>, do: Enum.fetch!(@base32, i)) |> to_string
+    do: for(<<i::size(5) <- n>>, do: Enum.fetch!(@base32, i)) |> to_string()
 
   defp to_base10(""), do: []
 
