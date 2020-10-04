@@ -1,7 +1,9 @@
 defmodule Geohax do
-  @moduledoc """
-  Geohash encoding and decoding.
-  """
+  @moduledoc "README.md"
+             |> File.read!()
+             |> String.split("<!-- MDOC !-->")
+             |> Enum.fetch!(1)
+
   use Bitwise
 
   import Integer, only: [is_even: 1]
@@ -109,7 +111,13 @@ defmodule Geohax do
   ## Examples
 
       iex> Geohax.within({16.731831, 52.291725}, {17.071703, 52.508736})
-      ["u37ck", "u37cm", "u37cq", "u37cr", "u3k12", "u3k13", "u3k16", "u3k17", "u3k1k", "u37cs", "u37ct", "u37cw", "u37cx", "u3k18", "u3k19", "u3k1d", "u3k1e", "u3k1s", "u37cu", "u37cv", "u37cy", "u37cz", "u3k1b", "u3k1c", "u3k1f", "u3k1g", "u3k1u", "u37fh", "u37fj", "u37fn", "u37fp", "u3k40", "u3k41", "u3k44", "u3k45", "u3k4h", "u37fk", "u37fm", "u37fq", "u37fr", "u3k42", "u3k43", "u3k46", "u3k47", "u3k4k", "u37fs", "u37ft", "u37fw", "u37fx", "u3k48", "u3k49", "u3k4d", "u3k4e", "u3k4s"]
+      ["u37ck", "u37cm", "u37cq", "u37cr", "u3k12", "u3k13", "u3k16", "u3k17",
+        "u3k1k", "u37cs", "u37ct", "u37cw", "u37cx", "u3k18", "u3k19", "u3k1d",
+        "u3k1e", "u3k1s", "u37cu", "u37cv", "u37cy", "u37cz", "u3k1b", "u3k1c",
+        "u3k1f", "u3k1g", "u3k1u", "u37fh", "u37fj", "u37fn", "u37fp", "u3k40",
+        "u3k41", "u3k44", "u3k45", "u3k4h", "u37fk", "u37fm", "u37fq", "u37fr",
+        "u3k42", "u3k43", "u3k46", "u3k47", "u3k4k", "u37fs", "u37ft", "u37fw",
+        "u37fx", "u3k48", "u3k49", "u3k4d", "u3k4e", "u3k4s"]
 
       iex> Geohax.within({16.731831, 52.291725}, {17.071703, 52.508736}, 3)
       ["u37", "u3k"]
