@@ -1,6 +1,8 @@
 defmodule Geohax.Mixfile do
   use Mix.Project
 
+  @source_url "https://github.com/evuez/geohax"
+
   def project do
     [
       app: :geohax,
@@ -10,7 +12,8 @@ defmodule Geohax.Mixfile do
       start_permanent: Mix.env() == :prod,
       description: description(),
       package: package(),
-      deps: deps()
+      deps: deps(),
+      docs: docs()
     ]
   end
 
@@ -28,11 +31,15 @@ defmodule Geohax.Mixfile do
     [
       licenses: ["MIT"],
       maintainers: ["evuez <helloevuez@gmail.com>"],
-      links: %{"GitHub" => "https://github.com/evuez/geohax"}
+      links: %{"GitHub" => @source_url}
     ]
   end
 
   def deps do
     [{:ex_doc, ">= 0.0.0", only: :dev}, {:inch_ex, only: :docs}]
+  end
+
+  defp docs do
+    [main: "Geohax", source_url: @source_url]
   end
 end
