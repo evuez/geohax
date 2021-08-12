@@ -7,6 +7,8 @@ defmodule Geohax do
 
   import Integer, only: [is_even: 1]
 
+  @type longitude() :: float()
+  @type latitude() :: float()
   @type direction() :: :north | :south | :east | :west
 
   @base32 '0123456789bcdefghjkmnpqrstuvwxyz'
@@ -38,7 +40,7 @@ defmodule Geohax do
       iex> Geohax.encode(-132.83, -38.1033, 6)
       "311x1r"
   """
-  @spec encode(float(), float(), pos_integer()) :: String.t()
+  @spec encode(longitude(), latitude(), pos_integer()) :: String.t()
   def encode(longitude, latitude, precision \\ 12) do
     bencode(longitude, latitude, precision * 5) |> to_base32()
   end
@@ -51,7 +53,7 @@ defmodule Geohax do
       iex> Geohax.decode("311x1r")
       {-132.83, -38.1033}
   """
-  @spec decode(String.t()) :: {float(), float()}
+  @spec decode(String.t()) :: {longitude(), latitude()}
   def decode(geohash) do
     geohash
     |> to_base10()
@@ -121,7 +123,7 @@ defmodule Geohax do
       iex> Geohax.within({16.731831, 52.291725}, {17.071703, 52.508736}, 3)
       ["u37", "u3k"]
   """
-  @spec within({float(), float()}, {float(), float()}, pos_integer()) :: [String.t()]
+  @spec within({longitude(), latitude()}, {longitude(), latitude()}, pos_integer()) :: [String.t()]
   def within({min_lon, min_lat}, {max_lon, max_lat}, precision \\ 5) do
     sw = encode(min_lon, min_lat, precision)
     ne = encode(max_lon, max_lat, precision)
