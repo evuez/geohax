@@ -7,6 +7,9 @@
 
 Geohash encoding and decoding for Elixir.
 
+
+**Note**: This project doesn't receive many updates mainly because its API is fairly small. **I'm still actively maintaining it.**
+
 ## Ordering of longitude and latitude
 
 *Every* function in `Geohax` use the `longitude,latitude` ordering; make sure not to invert these!
@@ -66,7 +69,7 @@ Add the `:geohax` dependency to your `mix.exs` file:
 
 ```elixir
 defp deps do
-  [{:geohax, ">= 0.0.0"}]
+  [{:geohax, "~> 1.0"}]
 end
 ```
 
